@@ -7,7 +7,6 @@ from util import load_crawled_pages
 def parse_nzz():
     print('start parsing NZZ...')
     pages = load_crawled_pages('NZZ')
-    pages = pages[0: 10]  # todo: remove
 
     start_time = datetime.now()
 
