@@ -70,7 +70,7 @@ def safe_parser_output(parser_output: list[dict[str, datetime.date, dict[str, bo
         for row in parser_output:
             writer.writerow([row['date']] + [value for _, value in row['match'].items()])
 
-
+'''
 pages = load_crawled_pages('NZZ')
 test_pages = pages[0: 100]
 
@@ -85,3 +85,4 @@ end_time = datetime.now()
 merged_parser_output = merge_same_days(parser_result)
 safe_parser_output(merged_parser_output, 'NZZ')
 print(f'parsed {len(test_pages)} pages in {end_time - start_time} seconds = {(end_time - start_time) / len(test_pages)} seconds per page')
+'''

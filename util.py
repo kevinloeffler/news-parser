@@ -9,12 +9,12 @@ def load_html(url: str) -> str:
 
 
 def save_crawled_pages(crawled_pages: list[str], filename):
-    with open('parsed-pages/' + filename + '.pkl', 'wb') as output:
+    with open('crawled-pages/' + filename + '.pkl', 'wb') as output:
         pickle.dump(crawled_pages, output, pickle.HIGHEST_PROTOCOL)
 
 
 def load_crawled_pages(filename: str) -> list[str]:
-    with open('parsed-pages/' + filename + '.pkl', 'rb') as input_file:
+    with open('crawled-pages/' + filename + '.pkl', 'rb') as input_file:
         return pickle.load(input_file)
 
 
