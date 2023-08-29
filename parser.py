@@ -1,7 +1,8 @@
 from datetime import datetime
 import csv
 from bs4 import BeautifulSoup
-from util import load_html, load_crawled_pages, create_unique_filename
+from util import load_html
+from typing import Union
 
 TARGET_WORDS = ['klimastreik', 'klima', 'streik']
 
@@ -15,7 +16,7 @@ def find_words(text: str, words: list[str]) -> dict[str, bool]:
     return result
 
 
-def parser_nzz(url: str) -> dict[str, datetime.date, dict[str, bool]] | None:
+def parser_nzz(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], None]:
     # helper function
     def extract_content(result: list):
         if len(result) == 0:
