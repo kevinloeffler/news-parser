@@ -15,32 +15,35 @@ def find_words(text: str, words: list[str]) -> dict[str, bool]:
     return result
 
 
-def parser_nzz(url: str) -> dict[str, datetime.date, dict[str, bool]]:
+def parser_nzz(url: str) -> dict[str, datetime.date, dict[str, bool]] | None:
     # helper function
     def extract_content(result: list):
         if len(result) == 0:
             return ''
         return result[0].text
 
-    html_document = load_html(url)
-    document = BeautifulSoup(html_document, features='html.parser')
+    try:
+        html_document = load_html(url)
+        document = BeautifulSoup(html_document, features='html.parser')
 
-    # parse date
-    time_tag = document.find('time')
-    date_time = datetime.strptime(time_tag['datetime'], '%Y-%m-%dT%H:%M:%S.%fZ')
-    date = date_time.date()
+        # parse date
+        time_tag = document.find('time')
+        date_time = datetime.strptime(time_tag['datetime'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        date = date_time.date()
 
-    # parse text
-    raw_title = document.find_all(name="h1", class_='headline__title')
-    title = extract_content(raw_title)
-    raw_lead = document.find_all(name='p', class_='headline__lead')
-    lead = extract_content(raw_lead)
-    raw_article = document.find_all(name='p', class_='articlecomponent')
-    article = extract_content(raw_article)
-    full_text = (title + ' ' + lead + ' ' + article).lower()
+        # parse text
+        raw_title = document.find_all(name="h1", class_='headline__title')
+        title = extract_content(raw_title)
+        raw_lead = document.find_all(name='p', class_='headline__lead')
+        lead = extract_content(raw_lead)
+        raw_article = document.find_all(name='p', class_='articlecomponent')
+        article = extract_content(raw_article)
+        full_text = (title + ' ' + lead + ' ' + article).lower()
 
-    matched_words = find_words(text=full_text, words=TARGET_WORDS)
-    return {'date': date, 'match': matched_words}
+        matched_words = find_words(text=full_text, words=TARGET_WORDS)
+        return {'date': date, 'match': matched_words}
+    except:
+        return None
 
 
 def merge_same_days(parser_output: list[dict[str, datetime.date, dict[str, bool]]]) -> list[dict[str, datetime.date, dict[str, bool]]]:
