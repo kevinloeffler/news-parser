@@ -62,16 +62,12 @@ def merge_same_days(parser_output: list[dict[str, datetime.date, dict[str, bool]
     return merged_output
 
 
-def safe_parser_output(parser_output: list[dict[str, datetime.date, dict[str, bool]]], name: str):
-    filename = create_unique_filename(f'results/{name.replace(" ", "_")}', suffix='.csv')
-    with open(filename, 'x', newline='') as file:
+def safe_parser_output(parser_output: list[dict[str, datetime.date, dict[str, int]]], filename: str):
+    with open(filename, 'a', newline='') as file:
         writer = csv.writer(file)
-
-        header_row = ['date'] + [key for key in parser_output[0]['match']]
-        writer.writerow(header_row)
-
         for row in parser_output:
             writer.writerow([row['date']] + [value for _, value in row['match'].items()])
+            print(f'wrote date {row["date"]} to {filename}')
 
 '''
 pages = load_crawled_pages('NZZ')

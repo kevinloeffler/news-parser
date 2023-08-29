@@ -1,3 +1,4 @@
+import csv
 import pickle
 import requests
 from os import path
@@ -25,3 +26,13 @@ def create_unique_filename(filename: str, suffix: str) -> str:
     while path.exists(filename + f'_{index}' + suffix):
         index += 1
     return filename + f'_{index}' + suffix
+
+
+def create_new_parser_result_file(name: str) -> str:
+    filename = create_unique_filename(f'results/{name}'.replace(" ", "_"), '.csv')
+    with open(filename, 'x', newline='') as file:
+        writer = csv.writer(file)
+        header_row = ['date', 'klimastreik', 'klima', 'streik']
+        writer.writerow(header_row)
+
+    return filename
