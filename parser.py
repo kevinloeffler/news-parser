@@ -47,6 +47,36 @@ def parser_nzz(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], Non
         return None
 
 
+def parser_20min(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], None]:
+    def extract_content(element) -> str:
+        if element:
+            return element.text
+        return ''
+
+    try:
+        html_document = load_html(url)
+        document = BeautifulSoup(html_document, features='html.parser')
+
+        # parse date
+        time_tag = document.find('time')
+        date_time = datetime.strptime(time_tag['datetime'], '%Y-%m-%dT%H:%M:%S%z')
+        date = date_time.date()
+
+        # parse text
+        raw_title = document.find(name='div', class_='Article_elementTitle__INyMX')
+        title = extract_content(raw_title)
+        raw_lead = document.find(name='div', class_='Article_elementLead__mvvHR')
+        lead = extract_content(raw_lead)
+        raw_article = document.find(name='section', class_='Article_body__Si4xG')
+        article = extract_content(raw_article)
+
+        full_text = title + ' ' + lead + ' ' + article
+        matched_words = find_words(text=full_text, words=TARGET_WORDS)
+        return {'date': date, 'match': matched_words}
+    except:
+        return None
+
+
 def merge_same_days(parser_output: list[dict[str, datetime.date, dict[str, bool]]]) -> list[dict[str, datetime.date, dict[str, bool]]]:
     output = iter(parser_output)
 
@@ -69,6 +99,7 @@ def safe_parser_output(parser_output: list[dict[str, datetime.date, dict[str, in
         for row in parser_output:
             writer.writerow([row['date']] + [value for _, value in row['match'].items()])
             print(f'wrote date {row["date"]} to {filename}')
+
 
 '''
 pages = load_crawled_pages('NZZ')

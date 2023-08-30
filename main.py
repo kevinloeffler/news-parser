@@ -18,6 +18,6 @@ Parser
 5)  Merge the output per day
 6)  Safe the merged results in the results directory
 """
-from parsers.run_nzz import parse_nzz
+from parsers.run_20min import parse_20min
 
-parse_nzz()
+parse_20min()

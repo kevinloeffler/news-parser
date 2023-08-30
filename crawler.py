@@ -44,6 +44,14 @@ def date_parser_nzz(url: str) -> date:
     return date_time.date()
 
 
+def date_parser_20min(url: str) -> date:
+    html_document = load_html(url)
+    doc = BeautifulSoup(html_document, features='html.parser')
+    time_tag = doc.find('time')
+    date_time = datetime.strptime(time_tag['datetime'], '%Y-%m-%dT%H:%M:%S%z')
+    return date_time.date()
+
+
 def find_pages_in_daterange(start_date: date,
                             end_date: date,
                             pages: list[str],
@@ -88,19 +96,20 @@ def find_biggest_date_index_before_target_date(target_date: date,
     return index - step_size
 
 
-pages = get_pages('sitemaps/NZZ.csv')
-reversed_pages = list(reversed(pages))
+def run_crawler():
+    pages = get_pages('sitemaps/20min.csv')
+    reversed_pages = list(reversed(pages))
 
-START_DATE = date(2018, 10, 1)
-END_DATE = date(2020, 1, 1)
+    START_DATE = date(2018, 10, 1)
+    END_DATE = date(2020, 1, 1)
 
-pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
-                                             end_date=END_DATE,
-                                             pages=reversed_pages,
-                                             date_parser=date_parser_nzz)
+    pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
+                                                 end_date=END_DATE,
+                                                 pages=reversed_pages,
+                                                 date_parser=date_parser_20min)
 
-print(f'found {len(pages_in_daterange)} pages')
-save_crawled_pages(pages_in_daterange, 'NZZ')
+    print(f'found {len(pages_in_daterange)} pages')
+    save_crawled_pages(pages_in_daterange, '20min')
 
 
 '''
