@@ -68,7 +68,7 @@ def parser_20min(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], N
         raw_lead = document.find(name='div', class_='Article_elementLead__mvvHR')
         lead = extract_content(raw_lead)
         raw_article = document.find(name='section', class_='Article_body__Si4xG')
-        article = extract_content(raw_article)
+        article = extract_content(raw_article).lower()
 
         full_text = title + ' ' + lead + ' ' + article
         matched_words = find_words(text=full_text, words=TARGET_WORDS)
