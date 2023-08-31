@@ -93,6 +93,42 @@ def merge_same_days(parser_output: list[dict[str, datetime.date, dict[str, bool]
     return merged_output
 
 
+def merge_same_days_with_numbers(parser_output: list[dict[str, datetime.date, dict[str, int]]]) -> list[dict[str, datetime.date, dict[str, bool]]]:
+    output = iter(parser_output)
+
+    first_element = next(output)
+    matches_of_first_element = {key: value for key, value in first_element['match'].items()}
+    merged_output = [{'date': first_element['date'], 'match': matches_of_first_element}]
+    print(merged_output)
+
+    for row in output:
+        if merged_output[-1]['date'] == row['date']:
+            for key, value in merged_output[-1]['match'].items():
+                merged_output[-1]['match'][key] += row['match'][key]
+        else:
+            merged_output.append(row)
+    return merged_output
+
+
+def sort_and_merge_results(input_file_path: str, output_file_name: str):
+    with open(input_file_path, 'r') as file:
+        reader = csv.reader(file)
+
+        with open(f'final_results/{output_file_name}', 'x') as new_file:
+            writer = csv.writer(new_file)
+            writer.writerow(next(reader))
+
+            l = []
+            for row in reader:
+                item = {'date': row[0], 'match': {'klimastreik': int(row[1]), 'klima': int(row[2]), 'streik': int(row[3])}}
+                l.append(item)
+
+            sorted_list = merge_same_days_with_numbers(l)
+
+            for row in sorted_list:
+                writer.writerow([row['date']] + [value for _, value in row['match'].items()])
+
+
 def safe_parser_output(parser_output: list[dict[str, datetime.date, dict[str, int]]], filename: str):
     with open(filename, 'a', newline='') as file:
         writer = csv.writer(file)
