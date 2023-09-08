@@ -34,8 +34,6 @@ def visualize_timeseries(filepath: str):
     y_data_3 = [int(row[3]) for row in data]
     x_data = [date[0] for date in data]
 
-    print(y_data_2)
-
     # plot
     fig, ax = plt.subplots()
     fig.set_size_inches(25, 4)
@@ -52,17 +50,14 @@ def visualize_timeseries(filepath: str):
     x_ticks = [x_data[int(i * tick_interval)] for i in range(number_of_x_ticks)]
     # y ticks
     biggest_y_value = int(max(y_data_1 + y_data_2 + y_data_3))
-    print(biggest_y_value)
     # draw ticks
     ax.set(xlim=(0, number_of_x_ticks), xticks=x_ticks,
            ylim=(0, biggest_y_value), yticks=range(biggest_y_value + 1))
-
-    print('biggest y:', biggest_y_value)
-    print('tick range:', range(biggest_y_value + 1))
 
     plt.suptitle(filepath.split('/')[-1][:-4], fontweight='bold')
     plt.title('number of articles per day containing the target word')
     plt.show()
 
 
-# visualize_timeseries(filepath='sorted_results/NZZ.csv')
+# new_file = sort_output_csv('results/20min_with_dublicates.csv', '20min')
+# visualize_timeseries(filepath='final_results/20min.csv')
