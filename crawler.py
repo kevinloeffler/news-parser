@@ -70,6 +70,9 @@ def find_date(target_date: date,
 
     # find the closest date to target date
     for step_size in step_sizes:
+        if step_size > (index + len(pages)):
+            continue  # prevent index out of range errors
+
         index = find_biggest_date_index_before_target_date(
             target_date=target_date,
             start_index=index,
@@ -91,8 +94,11 @@ def find_biggest_date_index_before_target_date(target_date: date,
                                                step_size: int,
                                                date_parser: Callable[[str], date]) -> int:
     index = start_index
+
     while date_parser(pages[index]) < target_date:
         index += step_size
+        if index > len(pages):
+            break  # prevent index out of range
     return index - step_size
 
 
