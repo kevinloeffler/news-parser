@@ -29,6 +29,7 @@ def run_parser(crawled_pages_filename: str, parser: Callable[[str], Union[dict[s
                 print('item:', item)
                 try:
                     result = future.result()
+                    print('result:', result)
                     if result is not None:
                         writer.writerow([result['date']] + [value for _, value in result['match'].items()])
                 except Exception as error:
