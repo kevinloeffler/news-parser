@@ -95,15 +95,30 @@ def parser_badener_tagblatt(url: str) -> Union[dict[str, datetime.date, dict[str
         date = extract_date(time_tag['datetime'])
 
         # parse text
-        '''
-        raw_title = document.find(name='h2', class_='headline__title')
-        title = extract_content(raw_title).lower()
-        raw_lead = document.find(name='p', class_='headline__lead')
-        lead = extract_content(raw_lead).lower()
-        raw_article = document.find(name='p', class_='articlecomponent')
-        article = extract_content(raw_article).lower()
-        '''
+        raw_article = document.find(name='div', class_='article')
+        article = extract_content(raw_article)
 
+        matched_words = find_words(text=article, words=TARGET_WORDS)
+        return {'date': date, 'match': matched_words}
+    except:
+        return None
+
+
+def parser_basler_zeitung(url: str) -> Union[dict[str, datetime.date, dict[str, int]], None]:
+    def extract_content(element) -> str:
+        if element:
+            return element.text.lower()
+        return ''
+
+    try:
+        html_document = load_html(url)
+        document = BeautifulSoup(html_document, features='html.parser')
+
+        # parse date
+        time_tag = document.find('time')
+        date = extract_date(time_tag['datetime'])
+
+        # parse text
         raw_article = document.find(name='div', class_='article')
         article = extract_content(raw_article)
 
