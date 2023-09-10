@@ -21,8 +21,8 @@ def run_parser(crawled_pages_filename: str, parser: Callable[[str], Union[dict[s
     with open(result_file, 'a', newline='') as file:
         writer = csv.writer(file)
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREAD_COUNT) as executor:
-            future_to_item = {executor.submit(parser, page): page for page in pages}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREAD_COUNT) as pool:
+            future_to_item = {pool.submit(parser, page): page for page in pages}
 
             for future in concurrent.futures.as_completed(future_to_item):
                 item = future_to_item[future]
