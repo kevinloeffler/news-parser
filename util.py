@@ -6,6 +6,19 @@ import requests
 from os import path
 
 
+def extract_date(date_string: str) -> date:
+    date_formats = ['%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%dT%H:%M:%S.%fZ']
+
+    for date_format in date_formats:
+        try:
+            date_time = datetime.strptime(date_string, date_format)
+            return date_time.date()
+        except ValueError as error:
+            continue
+
+    raise ValueError(f'time data "{date_string}" does not match any format')
+
+
 def load_html(url: str) -> str:
     response = requests.get(url)
     return response.text
