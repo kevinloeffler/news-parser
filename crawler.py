@@ -3,7 +3,7 @@ from datetime import datetime, date
 from bs4 import BeautifulSoup
 from typing import Callable
 
-from util import load_html, save_crawled_pages
+from util import load_html, save_crawled_pages, extract_date
 
 
 def get_pages(filename: str) -> list[str]:
@@ -50,6 +50,14 @@ def date_parser_20min(url: str) -> date:
     time_tag = doc.find('time')
     date_time = datetime.strptime(time_tag['datetime'], '%Y-%m-%dT%H:%M:%S%z')
     return date_time.date()
+
+
+def date_parser_badener_tagblatt(url: str) -> date:
+    html_document = load_html(url)
+    doc = BeautifulSoup(html_document, features='html.parser')
+    time_tag = doc.find('time')
+    date_time = extract_date(time_tag['datetime'])
+    return date_time
 
 
 def find_pages_in_daterange(start_date: date,
@@ -103,7 +111,7 @@ def find_biggest_date_index_before_target_date(target_date: date,
 
 
 def run_crawler():
-    pages = get_pages('sitemaps/20min.csv')
+    pages = get_pages('sitemaps/Badener_Tagblatt.csv')
     reversed_pages = list(reversed(pages))
 
     START_DATE = date(2018, 10, 1)
@@ -112,11 +120,13 @@ def run_crawler():
     pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
                                                  end_date=END_DATE,
                                                  pages=reversed_pages,
-                                                 date_parser=date_parser_20min)
+                                                 date_parser=date_parser_badener_tagblatt)
 
     print(f'found {len(pages_in_daterange)} pages')
-    save_crawled_pages(pages_in_daterange, '20min')
+    save_crawled_pages(pages_in_daterange, 'Badener_Tagblatt')
 
+
+# run_crawler()
 
 '''
 pages = get_pages('sitemaps/NZZ.csv', 1, 10)
