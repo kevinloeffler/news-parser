@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from parser import parser_20min
 from runner import run_parser
 from util import sort_and_merge_parser_result
