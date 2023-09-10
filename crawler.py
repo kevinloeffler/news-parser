@@ -60,6 +60,14 @@ def date_parser_badener_tagblatt(url: str) -> date:
     return date_time
 
 
+def date_parser_basler_zeitung(url: str) -> date:
+    html_document = load_html(url)
+    doc = BeautifulSoup(html_document, features='html.parser')
+    time_tag = doc.find('time')
+    date_time = extract_date(time_tag['datetime'])
+    return date_time
+
+
 def find_pages_in_daterange(start_date: date,
                             end_date: date,
                             pages: list[str],
