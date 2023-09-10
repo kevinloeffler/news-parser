@@ -68,6 +68,14 @@ def date_parser_basler_zeitung(url: str) -> date:
     return date_time
 
 
+def basic_date_parser(url: str) -> date:
+    html_document = load_html(url)
+    doc = BeautifulSoup(html_document, features='html.parser')
+    time_tag = doc.find('time')
+    date_time = extract_date(time_tag['datetime'])
+    return date_time
+
+
 def find_pages_in_daterange(start_date: date,
                             end_date: date,
                             pages: list[str],
@@ -119,7 +127,7 @@ def find_biggest_date_index_before_target_date(target_date: date,
 
 
 def run_crawler():
-    pages = get_pages('sitemaps/Badener_Tagblatt.csv')
+    pages = get_pages('sitemaps/Berner_Zeitung.csv')
     reversed_pages = list(reversed(pages))
 
     START_DATE = date(2018, 10, 1)
@@ -128,13 +136,13 @@ def run_crawler():
     pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
                                                  end_date=END_DATE,
                                                  pages=reversed_pages,
-                                                 date_parser=date_parser_badener_tagblatt)
+                                                 date_parser=basic_date_parser)
 
     print(f'found {len(pages_in_daterange)} pages')
-    save_crawled_pages(pages_in_daterange, 'Badener_Tagblatt')
+    save_crawled_pages(pages_in_daterange, 'Berner_Zeitung')
 
 
-# run_crawler()
+run_crawler()
 
 '''
 pages = get_pages('sitemaps/NZZ.csv', 1, 10)
