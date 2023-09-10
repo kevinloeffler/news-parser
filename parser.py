@@ -7,16 +7,16 @@ from typing import Union
 TARGET_WORDS = ['klimastreik', 'klima', 'streik']
 
 
-def find_words(text: str, words: list[str]) -> dict[str, bool]:
-    result: dict[str, bool] = {word: False for (word) in words}
+def find_words(text: str, words: list[str]) -> dict[str, int]:
+    result: dict[str, int] = {word: 0 for (word) in words}
     for t in text.split(' '):
         for word in words:
             if word in t:
-                result[word] = True
+                result[word] = 1
     return result
 
 
-def parser_nzz(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], None]:
+def parser_nzz(url: str) -> Union[dict[str, datetime.date, dict[str, int]], None]:
     # helper function
     def extract_content(result: list):
         if len(result) == 0:
@@ -47,10 +47,10 @@ def parser_nzz(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], Non
         return None
 
 
-def parser_20min(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], None]:
+def parser_20min(url: str) -> Union[dict[str, datetime.date, dict[str, int]], None]:
     def extract_content(element) -> str:
-        if element:
-            return element.text
+        if element[0]:
+            return element[0].text
         return ''
 
     try:
@@ -63,11 +63,14 @@ def parser_20min(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], N
         date = date_time.date()
 
         # parse text
-        raw_title = document.find(name='div', class_='Article_elementTitle__INyMX')
+        raw_title = document.find(name='div', class_='Article_elementTitle')
+        raw_title = document.select('[class*=Article_elementTitle]')
         title = extract_content(raw_title)
-        raw_lead = document.find(name='div', class_='Article_elementLead__mvvHR')
+        raw_lead = document.find(name='div', class_='Article_elementLead')
+        raw_lead = document.select('[class*=Article_elementLead]')
         lead = extract_content(raw_lead)
-        raw_article = document.find(name='section', class_='Article_body__Si4xG')
+        raw_article = document.find(name='section', class_='Article_body')
+        raw_article = document.select('[class*=Article_body]')
         article = extract_content(raw_article).lower()
 
         full_text = title + ' ' + lead + ' ' + article
@@ -77,7 +80,8 @@ def parser_20min(url: str) -> Union[dict[str, datetime.date, dict[str, bool]], N
         return None
 
 
-def merge_same_days(parser_output: list[dict[str, datetime.date, dict[str, bool]]]) -> list[dict[str, datetime.date, dict[str, bool]]]:
+'''
+def merge_same_days_with_booleans(parser_output: list[dict[str, datetime.date, dict[str, bool]]]) -> list[dict[str, datetime.date, dict[str, int]]]:
     output = iter(parser_output)
 
     first_element = next(output)
@@ -93,7 +97,7 @@ def merge_same_days(parser_output: list[dict[str, datetime.date, dict[str, bool]
     return merged_output
 
 
-def merge_same_days_with_numbers(parser_output: list[dict[str, datetime.date, dict[str, int]]]) -> list[dict[str, datetime.date, dict[str, bool]]]:
+def merge_same_days(parser_output: list[dict[str, datetime.date, dict[str, int]]]) -> list[dict[str, datetime.date, dict[str, int]]]:
     output = iter(parser_output)
 
     first_element = next(output)
@@ -118,15 +122,16 @@ def sort_and_merge_results(input_file_path: str, output_file_name: str):
             writer = csv.writer(new_file)
             writer.writerow(next(reader))
 
-            l = []
+            unmerged_list = []
             for row in reader:
                 item = {'date': row[0], 'match': {'klimastreik': int(row[1]), 'klima': int(row[2]), 'streik': int(row[3])}}
-                l.append(item)
+                unmerged_list.append(item)
 
-            sorted_list = merge_same_days_with_numbers(l)
+            sorted_list = merge_same_days(unmerged_list)
 
             for row in sorted_list:
                 writer.writerow([row['date']] + [value for _, value in row['match'].items()])
+'''
 
 
 def safe_parser_output(parser_output: list[dict[str, datetime.date, dict[str, int]]], filename: str):
@@ -135,21 +140,3 @@ def safe_parser_output(parser_output: list[dict[str, datetime.date, dict[str, in
         for row in parser_output:
             writer.writerow([row['date']] + [value for _, value in row['match'].items()])
             print(f'wrote date {row["date"]} to {filename}')
-
-
-'''
-pages = load_crawled_pages('NZZ')
-test_pages = pages[0: 100]
-
-start_time = datetime.now()
-parser_result = []
-for page in test_pages:
-    res = parser_nzz(page)
-    parser_result.append(res)
-    for key, value in res.items():
-        print(f'{key}: {value}')
-end_time = datetime.now()
-merged_parser_output = merge_same_days(parser_result)
-safe_parser_output(merged_parser_output, 'NZZ')
-print(f'parsed {len(test_pages)} pages in {end_time - start_time} seconds = {(end_time - start_time) / len(test_pages)} seconds per page')
-'''
