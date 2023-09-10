@@ -1,5 +1,7 @@
 import csv
 import pickle
+from datetime import datetime, date
+
 import requests
 from os import path
 
@@ -51,7 +53,7 @@ def sort_and_merge_parser_result(path_to_parser_result: str, path_to_output_file
             parser_result = []
             for row in reader:
                 parser_result.append({
-                    'date': row[0],
+                    'date': datetime.strptime(row[0], '%Y-%m-%d').date(),
                     'match': {'klimastreik': int(row[1]), 'klima': int(row[2]), 'streik': int(row[3])}
                 })
 
@@ -68,7 +70,10 @@ def sort_and_merge_parser_result(path_to_parser_result: str, path_to_output_file
 
 
 def sort_parser_result(parser_result: list[dict[str, any, dict[str, int]]]) -> list[dict[str, any, dict[str, int]]]:
-    return sorted(parser_result, key=lambda row: row['date'])
+    start_date = date(2018, 10, 1)
+    end_date = date(2020, 1, 1)
+    filtered_parser_result = filter(lambda row: start_date <= row['date'] <= end_date, parser_result)
+    return sorted(filtered_parser_result, key=lambda row: row['date'])
 
 
 def merge_parser_result(sorted_parser_result: list[dict[str, any, dict[str, int]]]) -> list[dict[str, any, dict[str, int]]]:
