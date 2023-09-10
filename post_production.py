@@ -59,5 +59,4 @@ def visualize_timeseries(filepath: str):
     plt.show()
 
 
-# new_file = sort_output_csv('results/20min_with_dublicates.csv', '20min')
-# visualize_timeseries(filepath='final_results/20min.csv')
+# visualize_timeseries(filepath='results/20min.csv')
