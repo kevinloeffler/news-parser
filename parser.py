@@ -187,6 +187,39 @@ def parser_blick(url: str) -> Union[dict[str, datetime.date, dict[str, int]], No
         return None
 
 
+def parser_freiburger(url: str) -> Union[dict[str, datetime.date, dict[str, int]], None]:
+    def extract_content(element) -> str:
+        if element:
+            return element.text.lower()
+        return ''
+
+    try:
+        html_document = load_html(url)
+        document = BeautifulSoup(html_document, features='html.parser')
+
+        # parse date
+        time_wrapper = document.find(name='span', class_='elementor-post-info__item--type-date')
+        date_string_array = time_wrapper.text.split('\n')
+        date_string = date_string_array[2].strip()
+        date = datetime.strptime(date_string, '%d.%m.%Y').date()
+
+        # parse text
+        raw_title = document.find(name='h1')
+        title = extract_content(raw_title)
+        raw_text = document.find(name='div', class_='elementor-widget-theme-post-content')
+        text = extract_content(raw_text)
+        raw_paywall_text = document.find(name='div', class_='elementor-widget-theme-post-excerpt')
+        paywall_text = extract_content(raw_paywall_text)
+
+        full_text = title + ' ' + text + ' ' + paywall_text
+        matched_words = find_words(text=full_text, words=TARGET_WORDS)
+        return {'date': date, 'match': matched_words}
+
+    except Exception as error:
+        print(error)
+        return None
+
+
 '''
 def merge_same_days_with_booleans(parser_output: list[dict[str, datetime.date, dict[str, bool]]]) -> list[dict[str, datetime.date, dict[str, int]]]:
     output = iter(parser_output)
