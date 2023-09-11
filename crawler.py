@@ -1,4 +1,5 @@
 import csv
+import re
 from datetime import datetime, date
 from bs4 import BeautifulSoup
 from typing import Callable
@@ -76,6 +77,14 @@ def basic_date_parser(url: str) -> date:
     return date_time
 
 
+def date_parser_blick(url: str) -> date:
+    html_document = load_html(url)
+    doc = BeautifulSoup(html_document, features='html.parser')
+    for x in doc.find_all(string=re.compile('Publiziert: (\d*\.\d*\.\d*)', flags=re.I)):
+        date_array = re.findall('Publiziert: (\d*)\.(\d*)\.(\d*)', x)[0]
+        return datetime(int(date_array[2]), int(date_array[1]), int(date_array[0])).date()
+
+
 def find_pages_in_daterange(start_date: date,
                             end_date: date,
                             pages: list[str],
@@ -123,11 +132,11 @@ def find_biggest_date_index_before_target_date(target_date: date,
         index += step_size
         if index > len(pages):
             break  # prevent index out of range
-    return index - step_size
+    return max(index - step_size, 0)
 
 
 def run_crawler():
-    pages = get_pages('sitemaps/Berner_Zeitung.csv')
+    pages = get_pages('sitemaps/Blick.csv')
     reversed_pages = list(reversed(pages))
 
     START_DATE = date(2018, 10, 1)
@@ -136,13 +145,13 @@ def run_crawler():
     pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
                                                  end_date=END_DATE,
                                                  pages=reversed_pages,
-                                                 date_parser=basic_date_parser)
+                                                 date_parser=date_parser_blick)
 
     print(f'found {len(pages_in_daterange)} pages')
-    save_crawled_pages(pages_in_daterange, 'Berner_Zeitung')
+    save_crawled_pages(pages_in_daterange, 'Blick')
 
 
-run_crawler()
+# run_crawler()
 
 '''
 pages = get_pages('sitemaps/NZZ.csv', 1, 10)
