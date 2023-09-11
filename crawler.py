@@ -85,6 +85,18 @@ def date_parser_blick(url: str) -> date:
         return datetime(int(date_array[2]), int(date_array[1]), int(date_array[0])).date()
 
 
+def date_parser_freiburger(url: str) -> date:
+    try:
+        html_document = load_html(url)
+        doc = BeautifulSoup(html_document, features='html.parser')
+        time_wrapper = doc.find(name='span', class_='elementor-post-info__item--type-date')
+        date_string_array = time_wrapper.text.split('\n')
+        date_string = date_string_array[2].strip()
+        return datetime.strptime(date_string, '%d.%m.%Y').date()
+    except:
+        return None
+
+
 def find_pages_in_daterange(start_date: date,
                             end_date: date,
                             pages: list[str],
