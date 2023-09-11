@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 import csv
 from bs4 import BeautifulSoup
@@ -128,7 +129,7 @@ def parser_basler_zeitung(url: str) -> Union[dict[str, datetime.date, dict[str, 
         return None
 
 
-def basic_parser(url: str) -> Union[dict[str, datetime.date, dict[str, int]], None]:
+def parser_berner_zeitung(url: str) -> Union[dict[str, datetime.date, dict[str, int]], None]:
     def extract_content(element) -> str:
         if element:
             return element.text.lower()
@@ -143,12 +144,46 @@ def basic_parser(url: str) -> Union[dict[str, datetime.date, dict[str, int]], No
         date = extract_date(time_tag['datetime'])
 
         # parse text
-        raw_article = document.find(name='div', class_='article')
+        raw_article = document.find(name='article')
         article = extract_content(raw_article)
 
         matched_words = find_words(text=article, words=TARGET_WORDS)
         return {'date': date, 'match': matched_words}
     except:
+        return None
+
+
+def parser_blick(url: str) -> Union[dict[str, datetime.date, dict[str, int]], None]:
+    def extract_content(element) -> str:
+        if element:
+            return element.text.lower()
+        return ''
+
+    try:
+        html_document = load_html(url)
+        document = BeautifulSoup(html_document, features='html.parser')
+        x = document.text[0]
+
+        # parse date
+        raw_date = document.find_all(string=re.compile('Publiziert: (\d*\.\d*\.\d*)', flags=re.I))[0]
+        date_array = re.findall('Publiziert: (\d*)\.(\d*)\.(\d*)', raw_date)[0]
+        date = datetime(int(date_array[2]), int(date_array[1]), int(date_array[0])).date()
+        print('date:', date)
+        if date is None:
+            return None
+
+        # parse text
+        raw_header = document.find(name='div', class_='bAlVHo')
+        header = extract_content(raw_header)
+        raw_text = document.find(name='article')
+        text = extract_content(raw_text)
+
+        full_text = header + ' ' + text
+        matched_words = find_words(text=full_text, words=TARGET_WORDS)
+        return {'date': date, 'match': matched_words}
+
+    except Exception as error:
+        print(error)
         return None
 
 
