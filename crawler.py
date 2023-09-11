@@ -37,6 +37,14 @@ def get_pages_with_range(filename: str, start: int, stop: int) -> list[str]:
     return pages
 
 
+def basic_date_parser(url: str) -> date:
+    html_document = load_html(url)
+    doc = BeautifulSoup(html_document, features='html.parser')
+    time_tag = doc.find('time')
+    date_time = extract_date(time_tag['datetime'])
+    return date_time
+
+
 def date_parser_nzz(url: str) -> date:
     html_document = load_html(url)
     doc = BeautifulSoup(html_document, features='html.parser')
@@ -68,13 +76,6 @@ def date_parser_basler_zeitung(url: str) -> date:
     date_time = extract_date(time_tag['datetime'])
     return date_time
 
-
-def basic_date_parser(url: str) -> date:
-    html_document = load_html(url)
-    doc = BeautifulSoup(html_document, features='html.parser')
-    time_tag = doc.find('time')
-    date_time = extract_date(time_tag['datetime'])
-    return date_time
 
 
 def date_parser_blick(url: str) -> date:
@@ -156,7 +157,7 @@ def find_biggest_date_index_before_target_date(target_date: date,
 
 
 def run_crawler():
-    pages = get_pages('sitemaps/Freiburger_Nachrichten.csv')
+    pages = get_pages('sitemaps/Luzerner_Zeitung.csv')
     reversed_pages = list(reversed(pages))
 
     START_DATE = date(2018, 10, 1)
@@ -165,10 +166,10 @@ def run_crawler():
     pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
                                                  end_date=END_DATE,
                                                  pages=reversed_pages,
-                                                 date_parser=date_parser_freiburger)
+                                                 date_parser=basic_date_parser)
 
     print(f'found {len(pages_in_daterange)} pages')
-    save_crawled_pages(pages_in_daterange, 'Freiburger_Nachrichten')
+    save_crawled_pages(pages_in_daterange, 'Luzerner_Zeitung')
 
 
 # run_crawler()
