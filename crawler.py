@@ -2,7 +2,7 @@ import csv
 import re
 from datetime import datetime, date
 from bs4 import BeautifulSoup
-from typing import Callable
+from typing import Callable, Union
 
 from util import load_html, save_crawled_pages, extract_date
 
@@ -97,7 +97,7 @@ def find_pages_in_daterange(start_date: date,
 def find_date(target_date: date,
               start_index: int,
               pages: list[str],
-              date_parser: Callable[[str], date]) -> int:
+              date_parser: Callable[[str], Union[date, None]]) -> int:
     step_sizes = [100_000, 10_000, 1_000, 100, 10]
     index = start_index
 
@@ -125,18 +125,26 @@ def find_biggest_date_index_before_target_date(target_date: date,
                                                start_index: int,
                                                pages: list[str],
                                                step_size: int,
-                                               date_parser: Callable[[str], date]) -> int:
+                                               date_parser: Callable[[str], Union[date, None]]) -> int:
     index = start_index
+    current_parsed_date = date_parser(pages[index])
 
-    while date_parser(pages[index]) < target_date:
+    while current_parsed_date < target_date:
         index += step_size
         if index > len(pages):
             break  # prevent index out of range
+
+        new_parsed_date = date_parser(pages[index])
+        while new_parsed_date is None:
+            index += 1
+            new_parsed_date = date_parser(pages[index])
+        current_parsed_date = new_parsed_date
+
     return max(index - step_size, 0)
 
 
 def run_crawler():
-    pages = get_pages('sitemaps/Blick.csv')
+    pages = get_pages('sitemaps/Freiburger_Nachrichten.csv')
     reversed_pages = list(reversed(pages))
 
     START_DATE = date(2018, 10, 1)
@@ -145,10 +153,10 @@ def run_crawler():
     pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
                                                  end_date=END_DATE,
                                                  pages=reversed_pages,
-                                                 date_parser=date_parser_blick)
+                                                 date_parser=date_parser_freiburger)
 
     print(f'found {len(pages_in_daterange)} pages')
-    save_crawled_pages(pages_in_daterange, 'Blick')
+    save_crawled_pages(pages_in_daterange, 'Freiburger_Nachrichten')
 
 
 # run_crawler()
