@@ -98,6 +98,17 @@ def date_parser_freiburger(url: str) -> date:
         return None
 
 
+def date_parser_suedostschweiz(url: str) -> date:
+    try:
+        html_document = load_html(url)
+        doc = BeautifulSoup(html_document, features='html.parser')
+        time_wrapper = doc.find(name='div', class_='node_display_date')
+        date_string = time_wrapper.text.strip()
+        return datetime.strptime(date_string, '%d.%m.%y - %H:%M Uhr').date()
+    except:
+        return None
+
+
 def find_pages_in_daterange(start_date: date,
                             end_date: date,
                             pages: list[str],
@@ -157,7 +168,7 @@ def find_biggest_date_index_before_target_date(target_date: date,
 
 
 def run_crawler():
-    pages = get_pages('sitemaps/Solothurner_Zeitung.csv')
+    pages = get_pages('sitemaps/Südostschweiz.csv')
     reversed_pages = list(reversed(pages))
 
     START_DATE = date(2018, 10, 1)
@@ -166,10 +177,10 @@ def run_crawler():
     pages_in_daterange = find_pages_in_daterange(start_date=START_DATE,
                                                  end_date=END_DATE,
                                                  pages=reversed_pages,
-                                                 date_parser=basic_date_parser)
+                                                 date_parser=date_parser_suedostschweiz)
 
     print(f'found {len(pages_in_daterange)} pages')
-    save_crawled_pages(pages_in_daterange, 'Solothurner_Zeitung')
+    save_crawled_pages(pages_in_daterange, 'Südostschweiz')
 
 
 run_crawler()
