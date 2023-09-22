@@ -16,8 +16,13 @@ Parser
 3)  Load the serialized pages from the crawled-pages directory
 4)  Parse every page
 5)  Merge the output per day
-6)  Safe the merged results in the results directory
-"""
-from parsers.run_20min import parse_20min
+6)  Safe the merged parser-results in the parser-results directory
 
-parse_20min()
+
+NEW:
+1) Create a text parser for the specific newspaper
+2) Parse crawled pages and safe them one after the other to the crawler-parser-results directory (unsorted and unmerged)
+3) Sort and merge the crawler parser-results and safe them to the parser-results directory
+4) Visualize and save the png to the plots directory
+
+"""

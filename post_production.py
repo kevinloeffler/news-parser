@@ -59,4 +59,4 @@ def visualize_timeseries(filepath: str):
     plt.show()
 
 
-# visualize_timeseries(filepath='results/20min.csv')
+visualize_timeseries(filepath='results/SG_Tagblatt.csv')
