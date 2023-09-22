@@ -157,7 +157,7 @@ def find_biggest_date_index_before_target_date(target_date: date,
 
 
 def run_crawler():
-    pages = get_pages('sitemaps/SG_Tagblatt.csv')
+    pages = get_pages('sitemaps/Solothurner_Zeitung.csv')
     reversed_pages = list(reversed(pages))
 
     START_DATE = date(2018, 10, 1)
@@ -169,10 +169,10 @@ def run_crawler():
                                                  date_parser=basic_date_parser)
 
     print(f'found {len(pages_in_daterange)} pages')
-    save_crawled_pages(pages_in_daterange, 'SG_Tagblatt')
+    save_crawled_pages(pages_in_daterange, 'Solothurner_Zeitung')
 
 
-# run_crawler()
+run_crawler()
 
 '''
 pages = get_pages('sitemaps/NZZ.csv', 1, 10)

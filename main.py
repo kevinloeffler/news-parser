@@ -26,3 +26,6 @@ NEW:
 4) Visualize and save the png to the plots directory
 
 """
+from parsers.run_solothurner_zeitung import parse_solothurner_zeitung
+
+parse_solothurner_zeitung()
